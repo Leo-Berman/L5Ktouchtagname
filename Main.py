@@ -15,7 +15,8 @@ def test_main():
     touchtag = prompt_touchtag()
     print(touchtag)
     # also for testing, the file will eventually be dynamic
-    lines = load_file(prompt_input_filepath("L5K"))
+    l5kpath = prompt_input_filepath("L5K")
+    lines = load_file(l5kpath)
 
     # to keep track of first line of program
     begin_program = 0
@@ -64,6 +65,10 @@ def test_main():
 
             # split alias into actual IO point, and what the alias is of that IO point
             tmp_alias=tmp_alias.group().strip().split(" OF ")
+            if tmp_alias[1].__contains__("."):
+                tmp_alias[1] = tmp_alias[1].split('.')[0]
+                
+            
             aliases.append(tmp_alias[0])
             ofs.append(tmp_alias[1])
 
@@ -71,6 +76,20 @@ def test_main():
         elif first_pass == False and lines[i].startswith("\t\t\t\tN: "):
             # update the line
             lines[i] = program_class.update_line(lines[i],touchtag)
+
+        elif lines[i].startswith("\tTAG"):
+            print("In here")
+            beginning_of_controller_tags = i
+            found_touchtag = False
+            while not lines[i].startswith("\tEND_TAG"):
+                if lines[i] == "\t\t"+touchtag+" : BOOL (RADIX := Decimal) := 0;\n":
+                    found_touchtag = True
+                i+=1
+            if found_touchtag == False:
+                lines.insert(beginning_of_controller_tags+1,"\t\t"+touchtag+" : BOOL (RADIX := Decimal) := 0;\n")
+            
         i+=1
+
+    write_lines(l5kpath,lines)
 if __name__ == "__main__":
     test_main()

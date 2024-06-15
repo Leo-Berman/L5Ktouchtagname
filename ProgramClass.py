@@ -36,9 +36,10 @@ class program:
             for y in items:
                 sub_items = y.split(".")
                 for z in sub_items:
-                    if z in self.TAGS_OF_INTEREST:
+                    if z in self.TAGS_OF_INTEREST and " [XIC("+addtouchtag+"),]" not in inline:
                         edit_index = inline.index(":")
-                        return inline[0:edit_index+1] + " [XIC("+addtouchtag+",]" + inline[edit_index+1:]
+                        return inline[0:edit_index+1] + " [XIC("+addtouchtag+"),]" + inline[edit_index+1:]
+        return inline
 def test_main():
     test_program = program()
     test_aliases = ['1','2','3','4','6']
