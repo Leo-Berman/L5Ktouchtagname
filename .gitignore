@@ -1,3 +1,6 @@
+# PyInstallerBuild stuff
+build/Main/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
