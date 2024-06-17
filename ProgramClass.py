@@ -1,53 +1,99 @@
 import re
 
-class program:
+class L5KProgram:
 
-   
-    def __init__(self):
-        self.TAGS_IN_PROGRAM = []
-        self.TAGS_OF_INTEREST = []
-    def calculate_tags_in_program(self,aliases:list,ofs:list):
+    def __init__(self, target_tags:list, input_aliases:list, input_ofs:list):
+
+        # Create lists to store tags in the program and tags of interest
+        self.program_tags = []
+        self.tags_of_interest = []
+
+        # Calculate tags_of_interest
+        self.calculate_tags_of_interest(target_tags, input_aliases, input_ofs)
         
-        while len(ofs) > 0:
-            base = {aliases.pop(0),ofs.pop(0)}
+    def calculate_tags_in_program(self, input_aliases:list, input_ofs:list):
+
+        # Repeat until list is empty
+        while len(input_ofs) > 0:
+
+            # Store both the alias and tag literal in A SET
+            tag_group = {input_aliases.pop(0),input_ofs.pop(0)}
+
+            # Iterate though the whole list
             i = 0
-            while i < len(ofs):
-                if ofs[i] in base or aliases[i] in base:
-                    base.add(ofs.pop(i))
-                    base.add(aliases.pop(i))
+            while i < len(input_ofs):
+
+                # If either the tag literal and alias matches the
+                # tag_group
+                if input_ofs[i] in tag_group or input_aliases[i] in tag_group:
+
+                    # Add them to the tag_group
+                    tag_group.add(input_ofs.pop(i))
+                    tag_group.add(input_aliases.pop(i))
+                    
                 else:
                     i+=1
-            self.TAGS_IN_PROGRAM.append(base)
-        print(self.TAGS_IN_PROGRAM)
-
-    def calculate_tags_of_interest(self,TARGET_TAGS):
-        for x in self.TAGS_IN_PROGRAM:
-            for y in x:
-                if y in TARGET_TAGS:
-                    self.TAGS_OF_INTEREST.extend(x)
-                    break
-        self.TAGS_OF_INTEREST.extend(TARGET_TAGS)
-        self.TAGS_OF_INTEREST = list(set(self.TAGS_OF_INTEREST))
                     
-    def update_line(self,inline,addtouchtag):
-        refs = re.findall(r"\(\S+?\)",inline)
-        for x in refs:
-            tmp = x[1:len(x)-1]
-            items = tmp.split(",")
-            for y in items:
-                sub_items = y.split(".")
-                for z in sub_items:
-                    if z in self.TAGS_OF_INTEREST and not inline.__contains__( " [XIC("+addtouchtag+"),]"):
-                        edit_index = inline.index(":")
-                        return inline[0:edit_index+1] + " [XIC("+addtouchtag+"),]" + inline[edit_index+1:]
-        return inline
-def test_main():
-    test_program = program()
-    test_aliases = ['1','2','3','4','6']
-    test_ofs = ['c','1','d','f','3']
+            # Add the grouped tags to the program tags
+            self.program_tags.append(tag_group)
 
-    test_program.calculate_tags_in_program(test_aliases,test_ofs)
-    test_program.calculate_tags_of_interest(['c'])
-    
-if __name__ == "__main__":
-    test_main()
+    def calculate_tags_of_interest(self, target_tags:list, input_aliases:list,
+                                   input_ofs:list):
+
+        self.calculate_tags_in_program(input_aliases,input_ofs)
+
+        # Iterate through program tag groups
+        for x in self.program_tags:
+
+            # Iterate through each tag groups tags
+            for y in x:
+
+                # If any of the tags in the group are in the target_tags
+                if y in target_tags:
+
+                    # Add the whole group to the tags of interest
+                    self.tags_of_interest.extend(x)
+                    break
+
+        # Add target controller tags to tags of interest
+        self.tags_of_interest.extend(target_tags)
+
+        # Remove duplicates
+        self.tags_of_interest = list(set(self.tags_of_interest))
+                    
+    def add_touch_tag(self,input_line,touch_tag):
+
+        # Find all of the logical components
+        logic_list = re.findall(r"\(\S+?\)",input_line)
+
+        # Iterate through all the logical components
+        for logic in logic_list:
+
+            # Remove the parenthesis and split into parameters
+            logic_parameters = logic[1:len(logic)-1].split(",")
+
+            
+            for parameter in logic_parameters:
+
+                # Split parameter into components
+                sub_parameters = parameter.split(".")
+
+                # Iterate through the components
+                for component in sub_parameters:
+
+                    # If the component is a tag of interest and the
+                    # touch tag isn't already there, add one
+                    if (component in self.tags_of_interest and not
+                        input_line.__contains__( " [XIC(" + touch_tag+"),]")):
+
+                        # Find the beginning of the logical rung
+                        edit_index = input_line.index(":")
+
+                        # return the line with the added tag
+                        return (input_line[0:edit_index + 1]
+                                + " [XIC("+touch_tag+"),]"
+                                + input_line[edit_index + 1 :])
+                    
+        # return the original line if nothing changed
+        return input_line
+
