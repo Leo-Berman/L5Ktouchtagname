@@ -12,12 +12,13 @@ class program:
             base = {aliases.pop(0),ofs.pop(0)}
             i = 0
             while i < len(ofs):
-                if ofs[i] in base:
+                if ofs[i] in base or aliases[i] in base:
                     base.add(ofs.pop(i))
                     base.add(aliases.pop(i))
                 else:
                     i+=1
             self.TAGS_IN_PROGRAM.append(base)
+        print(self.TAGS_IN_PROGRAM)
 
     def calculate_tags_of_interest(self,TARGET_TAGS):
         for x in self.TAGS_IN_PROGRAM:
@@ -36,7 +37,7 @@ class program:
             for y in items:
                 sub_items = y.split(".")
                 for z in sub_items:
-                    if z in self.TAGS_OF_INTEREST and " [XIC("+addtouchtag+"),]" not in inline:
+                    if z in self.TAGS_OF_INTEREST and not inline.__contains__( " [XIC("+addtouchtag+"),]"):
                         edit_index = inline.index(":")
                         return inline[0:edit_index+1] + " [XIC("+addtouchtag+"),]" + inline[edit_index+1:]
         return inline

@@ -46,6 +46,7 @@ def test_main():
         # if it is the beginning of a new program, note the beginning of the program
         # and create a new instance of the program class
         if tmp_program != None:
+            print(tmp_program.group())
             begin_program = i
             program_class = program()
 
@@ -82,7 +83,8 @@ def test_main():
             beginning_of_controller_tags = i
             found_touchtag = False
             while not lines[i].startswith("\tEND_TAG"):
-                if lines[i] == "\t\t"+touchtag+" : BOOL (RADIX := Decimal) := 0;\n":
+                print(lines[i])
+                if lines[i].startswith("\t\t"+touchtag+" :"):
                     found_touchtag = True
                 i+=1
             if found_touchtag == False:

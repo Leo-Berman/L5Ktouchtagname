@@ -39,4 +39,4 @@ def write_lines(input_filepath,content):
      file.writelines(content)
      
      file.close()
-     eg.msgbox("File written to :",input_filepath)
+     eg.msgbox("File written to :"+input_filepath)
