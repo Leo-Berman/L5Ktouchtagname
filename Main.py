@@ -2,21 +2,32 @@ import ProgramClass as PC
 import File_IO as FI
 import User_Interactions as UI
 import re
-
+import easygui as eg
 def main():
-
+    UI.message_user("Enter in tags file","Input Tags")
+    
     # Read in a list of tags the user is interested in
     input_tags = FI.load_tags(UI.prompt_file("txt"))
 
+    output = eg.ynbox("Would you like to enter ignored programs","Ignored Programs")
+
+    if (output):
+        UI.message_user("Enter in program file","Input Programs")
+    
+        # Read in a list of tags the user is interested in
+        input_programs = FI.load_tags(UI.prompt_file("txt"))
+    
+    
     # Get tag user wants to use for cross reference
     touch_tag = UI.prompt_touch_tag()
-
+    
     # Load the L5K file
     L5K_path = UI.prompt_file("L5K")
     L5K_lines = FI.load_file(L5K_path)
 
     first_pass = True
     line_index = 0
+    current_program = None
     while line_index < len(L5K_lines):
 
         # Search for beginning of a program
@@ -28,6 +39,8 @@ def main():
         # If beginning of a program found, initialize variables
         if tmp_program != None:
 
+            current_program = tmp_program.group().strip()
+            print(current_program)
             # Keep track of line where program begins
             program_start = line_index
           
@@ -50,6 +63,7 @@ def main():
                 
             else:
                 first_pass = True
+                current_program = None
 
         
         # If an alias is found during the first_pass
@@ -68,7 +82,8 @@ def main():
             
         # If a logic rung is found during the second pass,
         elif (first_pass == False and
-              L5K_lines[line_index].startswith("\t\t\t\tN: ")):
+              L5K_lines[line_index].startswith("\t\t\t\tN: ") and
+              current_program in input_programs):
 
             # Add the touchtag to the rung
             L5K_lines[line_index] = program_class.update_line(

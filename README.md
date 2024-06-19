@@ -11,6 +11,14 @@ Prompted Parameters:
 	    Controller Tag ...
 	    Controller Tag N
 
+	"Program BlacklistTags of Interest" - TXT file with format:
+	    Program Name 1
+	    Program Name 2
+	    Program Name 3
+
+
+
+
 	"Touch Tag" - Name of tag you will be cross-referencing:
 	    String consisting of Alpha-Numeric Characters and Underscore Characters
 
